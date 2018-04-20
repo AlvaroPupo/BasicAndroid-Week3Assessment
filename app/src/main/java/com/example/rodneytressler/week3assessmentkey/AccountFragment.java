@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +29,7 @@ public class AccountFragment extends Fragment {
     @BindView(R.id.class_input)
     protected EditText classInput;
 
-    @OnClick(R.id.button_finish)
-    protected void onFinishButtonClicked(View view) {
-
-    }
-
-
-
+    private ActivityCallback activityCallback;
 
     @Nullable
     @Override
@@ -52,24 +47,51 @@ public class AccountFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    @OnClick(R.id.button_finish)
+    protected void onFinishButtonClicked() {
 
-
-
-    private void showAlertDialog(String message) {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog);
+        if(TextUtils.isEmpty(nameInput.getText().toString()) || TextUtils.isEmpty(classInput.getText().toString())) {
+            emptyFields();
+        }else if (!classInput.getText().toString().equalsIgnoreCase("warrior") && !classInput.getText().toString().equalsIgnoreCase("mage") && !classInput.getText().toString().equalsIgnoreCase("archer")){
+            classMismatch();
         } else {
-            builder = new AlertDialog.Builder(getContext());
+            activityCallback.userClassNameInfo(nameInput.getText().toString(), classInput.getText().toString());
+            nameInput.setText("");
+            classInput.setText("");
         }
-        builder.setTitle("Error")
-                .setMessage(message)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+    }
+
+    protected void emptyFields() {
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+        builder.setTitle("Information required")
+                .setMessage("Please complete the information on all fields")
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                .setIcon(android.R.drawable.alert_light_frame).show();
+    }
+    protected void classMismatch(){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+        builder.setTitle("Enter a valid class")
+                .setMessage("You can only enter: warrior, mage or archer")
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.alert_light_frame).show();
+                classInput.setText("");
+    }
+
+    public void attachParent(ActivityCallback activityCallback) {
+        this.activityCallback = activityCallback;
+    }
+    public interface ActivityCallback{
+        void userClassNameInfo (String userName, String UserClass);
     }
 }

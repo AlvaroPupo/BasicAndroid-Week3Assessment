@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Week3AssessmentKey</string>
+    <string name="welcome_string">Welcome, %1$s the %2$s!</string>
 </resources>
